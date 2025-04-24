@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Grabado Patente Web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Grabados Locohones</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,40 +19,23 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .preview-wrapper {
-      margin-top: 16px;
-      height: 160px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
     .preview {
+      margin-top: 16px;
       font-size: 40px;
       font-weight: bold;
       background-color: white;
+      height: 160px;
       width: 100%;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
       border-radius: 0;
-      flex-direction: column;
-      gap: 8px;
-      position: relative;
-      transition: transform 0.2s ease;
+      transform: scaleX(1);
+      transition: transform 0.3s ease-in-out;
     }
-    .preview img {
-      object-fit: contain;
-      display: block;
-      margin: 0 auto;
-    }
-    .texto-patente {
-      font-size: 48px;
-      line-height: 1;
-    }
-    .espejo {
+    .mirror {
       transform: scaleX(-1);
     }
     button {
@@ -75,14 +58,6 @@
       border-radius: 6px;
       box-sizing: border-box;
     }
-    label.slider-label {
-      display: block;
-      margin-top: 12px;
-      font-weight: bold;
-    }
-    input[type="range"] {
-      width: 100%;
-    }
     @media print {
       @page {
         size: 57mm 40mm;
@@ -95,15 +70,23 @@
       body * {
         visibility: hidden;
       }
-      #wrapper, #wrapper * {
+      #vistaPrevia, #vistaPrevia * {
         visibility: visible;
       }
-      #wrapper {
+      #vistaPrevia {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 48px;
+        page-break-after: avoid;
+        page-break-before: avoid;
+        page-break-inside: avoid;
       }
     }
   </style>
@@ -111,124 +94,85 @@
 <body>
   <div class="container">
     <label for="patente">Patente del Vehículo:</label>
-    <input type="text" id="patente" placeholder="Ej: ZX2942" maxlength="6" oninput="this.value = this.value.toUpperCase();" />
+    <input type="text" id="patente" placeholder="Ej: ZX2942" maxlength="6" oninput="this.value = this.value.toUpperCase(); actualizarVistaPrevia();" />
 
     <label for="logo">Marca del Vehículo (opcional):</label>
-    <select id="logo">
+    <select id="logo" onchange="actualizarVistaPrevia()">
       <option value="">-- Sin Marca --</option>
+      <option value="toyota.png">Toyota</option>
+      <option value="chevrolet.png">Chevrolet</option>
+      <option value="ford.png">Ford</option>
+      <option value="hyundai.png">Hyundai</option>
+      <option value="kia.png">Kia</option>
+      <option value="nissan.png">Nissan</option>
+      <option value="jeep.png">Jeep</option>
+      <option value="volvo.png">Volvo</option>
+      <option value="mercedes.png">Mercedes-Benz</option>
+      <option value="maxus.png">Maxus</option>
+      <option value="volkswagen.png">Volkswagen</option>
+      <option value="changan.png">Changan</option>
       <option value="audi.png">Audi</option>
       <option value="bmw.png">BMW</option>
-      <option value="changan.png">Changan</option>
-      <option value="chevrolet.png">Chevrolet</option>
       <option value="chery.png">Chery</option>
       <option value="citroen.png">Citroen</option>
-      <option value="ford.png">Ford</option>
       <option value="greatWall.png">Great Wall</option>
       <option value="honda.png">Honda</option>
-      <option value="hyundai.png">Hyundai</option>
-      <option value="jeep.png">Jeep</option>
       <option value="jetour.png">Jetour</option>
-      <option value="kia.png">Kia</option>
       <option value="mazda.png">Mazda</option>
-      <option value="maxus.png">Maxus</option>
-      <option value="mercedes.png">Mercedes-Benz</option>
-      <option value="nissan.png">Nissan</option>
       <option value="peugeot.png">Peugeot</option>
       <option value="renault.png">Renault</option>
       <option value="samsung.png">Samsung</option>
       <option value="ssangyong.png">Ssangyong</option>
       <option value="subaru.png">Subaru</option>
       <option value="susuki.png">Susuki</option>
-      <option value="toyota.png">Toyota</option>
-      <option value="volkswagen.png">Volkswagen</option>
-      <option value="volvo.png">Volvo</option>
     </select>
 
-    <label class="slider-label" for="logoSize">Tamaño del Logo:</label>
-    <input type="range" id="logoSize" min="20" max="120" value="60" oninput="actualizarVista()">
+    <label><input type="checkbox" id="negritaPatente" onchange="actualizarVistaPrevia()" /> Texto en Negrita</label>
 
-    <label class="slider-label" for="textOffset">Ajuste Vertical del Texto:</label>
-    <input type="range" id="textOffset" min="-50" max="50" value="0" oninput="actualizarVista()">
-
-    <label class="slider-label" for="blockOffset">Ajuste Vertical del Bloque Completo:</label>
-    <input type="range" id="blockOffset" min="-80" max="80" value="0" oninput="actualizarVista()">
-
-    <label class="slider-label">
-      <input type="checkbox" id="negrita" onchange="actualizarVista()" checked /> Texto en Negrita
-    </label>
+    <label for="tamanoLogo">Tamaño del Logo:</label>
+    <input type="range" id="tamanoLogo" min="20" max="100" value="60" oninput="actualizarVistaPrevia()" />
 
     <button onclick="generarPlantilla()">Generar Plantilla</button>
-    <button onclick="alternarEspejo()" id="btnEspejo" style="display:none;">Alternar Modo Espejo</button>
-    <button onclick="window.print()" style="display:none;" id="btnImprimir">Imprimir Plantilla</button>
-    <button onclick="limpiarCampos()">Limpiar Campos</button>
+    <button onclick="alternarEspejo()">Alternar Modo Espejo</button>
 
-    <div class="preview-wrapper" id="wrapper" style="display:none;">
-      <div class="preview" id="vistaPrevia"></div>
-    </div>
+    <div class="preview" id="vistaPrevia" style="display:none;"></div>
+
+    <button onclick="window.print()" style="display:none;" id="btnImprimir">Imprimir Plantilla</button>
   </div>
 
   <script>
     function generarPlantilla() {
+      const vistaPrevia = document.getElementById('vistaPrevia');
+      const btnImprimir = document.getElementById('btnImprimir');
+      vistaPrevia.style.display = 'flex';
+      btnImprimir.style.display = 'inline-block';
+      actualizarVistaPrevia();
+    }
+
+    function actualizarVistaPrevia() {
       const patente = document.getElementById('patente').value.trim().toUpperCase();
+      const logo = document.getElementById('logo').value;
+      const negrita = document.getElementById('negritaPatente').checked;
+      const tamanoLogo = document.getElementById('tamanoLogo').value;
+      const vistaPrevia = document.getElementById('vistaPrevia');
+
       if (patente.length !== 6) {
-        alert('La patente debe tener exactamente 6 caracteres.');
+        vistaPrevia.innerHTML = '<div style="color:red">Debe ingresar 6 caracteres</div>';
         return;
       }
 
-      document.getElementById('wrapper').style.display = 'flex';
-      document.getElementById('btnImprimir').style.display = 'inline-block';
-      document.getElementById('btnEspejo').style.display = 'inline-block';
+      const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'};`;
 
-      actualizarVista();
-    }
-
-    function actualizarVista() {
-      const patente = document.getElementById('patente').value.trim().toUpperCase();
-      const logo = document.getElementById('logo').value;
-      const logoSize = document.getElementById('logoSize').value;
-      const textOffset = document.getElementById('textOffset').value;
-      const blockOffset = document.getElementById('blockOffset').value;
-      const negrita = document.getElementById('negrita').checked;
-      const vistaPrevia = document.getElementById('vistaPrevia');
-
-      let contenido = '';
-      if (logo) {
-        contenido += `<div><img src="logos/${logo}" alt="Logo" style="height:${logoSize}px;"></div>`;
-      }
-
-      contenido += `<div style="margin-top:${textOffset}px;">
-                      <div class="texto-patente" style="font-weight:${negrita ? 'bold' : 'normal'};">${patente}</div>
-                    </div>`;
-
-      vistaPrevia.innerHTML = contenido;
-      vistaPrevia.style.marginTop = `${blockOffset}px`;
+      vistaPrevia.innerHTML = logo
+        ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:4px;" onerror="this.style.display='none';">
+           <div style="${estiloTexto}">${patente}</div>`
+        : `<div style="${estiloTexto}">${patente}</div>`;
     }
 
     function alternarEspejo() {
-      const wrapper = document.getElementById('wrapper');
-      wrapper.classList.toggle('espejo');
+      const vistaPrevia = document.getElementById('vistaPrevia');
+      vistaPrevia.classList.toggle('mirror');
     }
-
-    function limpiarCampos() {
-      document.getElementById('patente').value = '';
-      document.getElementById('logo').value = '';
-      document.getElementById('logoSize').value = 60;
-      document.getElementById('textOffset').value = 0;
-      document.getElementById('blockOffset').value = 0;
-      document.getElementById('negrita').checked = true;
-
-      document.getElementById('vistaPrevia').innerHTML = '';
-      document.getElementById('vistaPrevia').style.marginTop = '';
-      document.getElementById('wrapper').style.display = 'none';
-      document.getElementById('wrapper').classList.remove('espejo');
-      document.getElementById('btnImprimir').style.display = 'none';
-      document.getElementById('btnEspejo').style.display = 'none';
-    }
-
-    window.onafterprint = function () {
-      limpiarCampos();
-    };
   </script>
 </body>
 </html>
-
