@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Grabados Locohones</title>
   <style>
     body {
@@ -34,13 +33,10 @@
       text-align: center;
       border-radius: 0;
       transform: scaleX(1);
+      transition: transform 0.3s ease-in-out;
     }
     .mirror {
       transform: scaleX(-1);
-    }
-    .preview img {
-      height: 60px;
-      margin-bottom: 4px;
     }
     button {
       width: 100%;
@@ -87,6 +83,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        font-size: 48px;
         page-break-after: avoid;
         page-break-before: avoid;
         page-break-inside: avoid;
@@ -96,38 +93,38 @@
 </head>
 <body>
   <div class="container">
-    <label for="patente">Ingrese la Patente (6 caracteres):</label>
-    <input type="text" id="patente" maxlength="6" placeholder="Ej: AB1234" oninput="this.value = this.value.toUpperCase();">
+    <label for="patente">Patente del Vehículo:</label>
+    <input type="text" id="patente" placeholder="Ej: ZX2942" maxlength="6" oninput="this.value = this.value.toUpperCase();" />
 
     <label for="logo">Marca del Vehículo (opcional):</label>
     <select id="logo">
       <option value="">-- Sin Marca --</option>
+      <option value="toyota.png">Toyota</option>
+      <option value="chevrolet.png">Chevrolet</option>
+      <option value="ford.png">Ford</option>
+      <option value="hyundai.png">Hyundai</option>
+      <option value="kia.png">Kia</option>
+      <option value="nissan.png">Nissan</option>
+      <option value="jeep.png">Jeep</option>
+      <option value="volvo.png">Volvo</option>
+      <option value="mercedes.png">Mercedes-Benz</option>
+      <option value="maxus.png">Maxus</option>
+      <option value="volkswagen.png">Volkswagen</option>
+      <option value="changan.png">Changan</option>
       <option value="audi.png">Audi</option>
       <option value="bmw.png">BMW</option>
-      <option value="changan.png">Changan</option>
-      <option value="chevrolet.png">Chevrolet</option>
       <option value="chery.png">Chery</option>
       <option value="citroen.png">Citroen</option>
-      <option value="ford.png">Ford</option>
       <option value="greatWall.png">Great Wall</option>
       <option value="honda.png">Honda</option>
-      <option value="hyundai.png">Hyundai</option>
-      <option value="jeep.png">Jeep</option>
       <option value="jetour.png">Jetour</option>
-      <option value="kia.png">Kia</option>
       <option value="mazda.png">Mazda</option>
-      <option value="maxus.png">Maxus</option>
-      <option value="mercedes.png">Mercedes-Benz</option>
-      <option value="nissan.png">Nissan</option>
       <option value="peugeot.png">Peugeot</option>
       <option value="renault.png">Renault</option>
       <option value="samsung.png">Samsung</option>
       <option value="ssangyong.png">Ssangyong</option>
       <option value="subaru.png">Subaru</option>
       <option value="susuki.png">Susuki</option>
-      <option value="toyota.png">Toyota</option>
-      <option value="volkswagen.png">Volkswagen</option>
-      <option value="volvo.png">Volvo</option>
     </select>
 
     <button onclick="generarPlantilla()">Generar Plantilla</button>
@@ -142,7 +139,6 @@
     function generarPlantilla() {
       const patente = document.getElementById('patente').value.trim().toUpperCase();
       const logo = document.getElementById('logo').value;
-
       const vistaPrevia = document.getElementById('vistaPrevia');
       const btnImprimir = document.getElementById('btnImprimir');
 
@@ -151,7 +147,10 @@
         return;
       }
 
-      vistaPrevia.innerHTML = logo ? `<img src="assets/logos/${logo}" alt="logo"><div>${patente}</div>` : `<div>${patente}</div>`;
+      vistaPrevia.innerHTML = logo
+        ? `<img src="./logos/${logo}" alt="logo" style="height:60px; margin-bottom:4px;" onerror="this.style.display='none';"><div>${patente}</div>`
+        : `<div>${patente}</div>`;
+
       vistaPrevia.style.display = 'flex';
       btnImprimir.style.display = 'inline-block';
     }
