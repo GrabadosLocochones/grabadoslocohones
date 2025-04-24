@@ -24,26 +24,16 @@
       font-size: 40px;
       font-weight: bold;
       background-color: white;
-      height: 113px; /* equivalente a 30mm en 96dpi */
-      width: 177px; /* equivalente a 47mm en 96dpi */
+      height: 160px;
+      width: 100%;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      justify-content: center;
       align-items: center;
       text-align: center;
       border-radius: 0;
       transform: scaleX(1);
       transition: transform 0.3s ease-in-out;
-      position: relative;
-      overflow: hidden;
-    }
-    .content-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
     }
     .mirror {
       transform: scaleX(-1);
@@ -142,9 +132,6 @@
     <label for="tamanoLogo">Tamaño del Logo:</label>
     <input type="range" id="tamanoLogo" min="20" max="100" value="60" oninput="actualizarVistaPrevia()" />
 
-    <label for="ajusteVertical">Ajuste Vertical (logo y texto):</label>
-    <input type="range" id="ajusteVertical" min="-40" max="40" value="0" oninput="actualizarVistaPrevia()" />
-
     <button onclick="generarPlantilla()">Generar Plantilla</button>
     <button onclick="alternarEspejo()">Alternar Modo Espejo</button>
 
@@ -167,7 +154,6 @@
       const logo = document.getElementById('logo').value;
       const negrita = document.getElementById('negritaPatente').checked;
       const tamanoLogo = document.getElementById('tamanoLogo').value;
-      const ajusteVertical = document.getElementById('ajusteVertical').value;
       const vistaPrevia = document.getElementById('vistaPrevia');
 
       if (patente.length !== 6) {
@@ -176,12 +162,11 @@
       }
 
       const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'};`;
-      const marginTop = `${ajusteVertical}px`;
 
-      vistaPrevia.innerHTML = `<div class="content-wrapper" style="top: calc(50% + ${ajusteVertical}px); transform: translate(-50%, -50%)">
-        ${logo ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; max-height:50px; margin-bottom:4px;" onerror="this.style.display='none';">` : ''}
-        <div style="${estiloTexto}; max-height:50px; overflow:hidden;">${patente}</div>
-      </div>`;
+      vistaPrevia.innerHTML = logo
+        ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:4px;" onerror="this.style.display='none';">
+           <div style="${estiloTexto}">${patente}</div>`
+        : `<div style="${estiloTexto}">${patente}</div>`;
     }
 
     function alternarEspejo() {
