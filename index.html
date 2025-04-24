@@ -28,12 +28,21 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       text-align: center;
       border-radius: 0;
       transform: scaleX(1);
       transition: transform 0.3s ease-in-out;
+      position: relative;
+    }
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
     }
     .mirror {
       transform: scaleX(-1);
@@ -132,6 +141,9 @@
     <label for="tamanoLogo">Tamaño del Logo:</label>
     <input type="range" id="tamanoLogo" min="20" max="100" value="60" oninput="actualizarVistaPrevia()" />
 
+    <label for="ajusteVertical">Ajuste Vertical (logo y texto):</label>
+    <input type="range" id="ajusteVertical" min="-80" max="80" value="0" oninput="actualizarVistaPrevia()" />
+
     <button onclick="generarPlantilla()">Generar Plantilla</button>
     <button onclick="alternarEspejo()">Alternar Modo Espejo</button>
 
@@ -154,6 +166,7 @@
       const logo = document.getElementById('logo').value;
       const negrita = document.getElementById('negritaPatente').checked;
       const tamanoLogo = document.getElementById('tamanoLogo').value;
+      const ajusteVertical = document.getElementById('ajusteVertical').value;
       const vistaPrevia = document.getElementById('vistaPrevia');
 
       if (patente.length !== 6) {
@@ -162,11 +175,12 @@
       }
 
       const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'};`;
+      const marginTop = `${ajusteVertical}px`;
 
-      vistaPrevia.innerHTML = logo
-        ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:4px;" onerror="this.style.display='none';">
-           <div style="${estiloTexto}">${patente}</div>`
-        : `<div style="${estiloTexto}">${patente}</div>`;
+      vistaPrevia.innerHTML = `<div class="content-wrapper" style="top: calc(50% + ${ajusteVertical}px); transform: translate(-50%, -50%)">
+        ${logo ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:4px;" onerror="this.style.display='none';">` : ''}
+        <div style="${estiloTexto}">${patente}</div>
+      </div>`;
     }
 
     function alternarEspejo() {
