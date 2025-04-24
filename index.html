@@ -94,10 +94,10 @@
 <body>
   <div class="container">
     <label for="patente">Patente del Vehículo:</label>
-    <input type="text" id="patente" placeholder="Ej: ZX2942" maxlength="6" oninput="this.value = this.value.toUpperCase();" />
+    <input type="text" id="patente" placeholder="Ej: ZX2942" maxlength="6" oninput="this.value = this.value.toUpperCase(); actualizarVistaPrevia();" />
 
     <label for="logo">Marca del Vehículo (opcional):</label>
-    <select id="logo">
+    <select id="logo" onchange="actualizarVistaPrevia()">
       <option value="">-- Sin Marca --</option>
       <option value="toyota.png">Toyota</option>
       <option value="chevrolet.png">Chevrolet</option>
@@ -127,6 +127,11 @@
       <option value="susuki.png">Susuki</option>
     </select>
 
+    <label><input type="checkbox" id="negritaPatente" onchange="actualizarVistaPrevia()" /> Texto en Negrita</label>
+
+    <label for="tamanoLogo">Tamaño del Logo:</label>
+    <input type="range" id="tamanoLogo" min="20" max="100" value="60" oninput="actualizarVistaPrevia()" />
+
     <button onclick="generarPlantilla()">Generar Plantilla</button>
     <button onclick="alternarEspejo()">Alternar Modo Espejo</button>
 
@@ -137,22 +142,31 @@
 
   <script>
     function generarPlantilla() {
-      const patente = document.getElementById('patente').value.trim().toUpperCase();
-      const logo = document.getElementById('logo').value;
       const vistaPrevia = document.getElementById('vistaPrevia');
       const btnImprimir = document.getElementById('btnImprimir');
+      vistaPrevia.style.display = 'flex';
+      btnImprimir.style.display = 'inline-block';
+      actualizarVistaPrevia();
+    }
+
+    function actualizarVistaPrevia() {
+      const patente = document.getElementById('patente').value.trim().toUpperCase();
+      const logo = document.getElementById('logo').value;
+      const negrita = document.getElementById('negritaPatente').checked;
+      const tamanoLogo = document.getElementById('tamanoLogo').value;
+      const vistaPrevia = document.getElementById('vistaPrevia');
 
       if (patente.length !== 6) {
-        alert('La patente debe tener exactamente 6 caracteres.');
+        vistaPrevia.innerHTML = '<div style="color:red">Debe ingresar 6 caracteres</div>';
         return;
       }
 
-      vistaPrevia.innerHTML = logo
-        ? `<img src="./logos/${logo}" alt="logo" style="height:60px; margin-bottom:4px;" onerror="this.style.display='none';"><div>${patente}</div>`
-        : `<div>${patente}</div>`;
+      const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'};`;
 
-      vistaPrevia.style.display = 'flex';
-      btnImprimir.style.display = 'inline-block';
+      vistaPrevia.innerHTML = logo
+        ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:4px;" onerror="this.style.display='none';">
+           <div style="${estiloTexto}">${patente}</div>`
+        : `<div style="${estiloTexto}">${patente}</div>`;
     }
 
     function alternarEspejo() {
