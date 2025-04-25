@@ -20,6 +20,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .preview {
+      position: relative;
       margin-top: 16px;
       font-size: 40px;
       font-weight: bold;
@@ -27,13 +28,29 @@
       height: 160px;
       width: 100%;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
       border-radius: 0;
       transform: scaleX(1);
       transition: transform 0.3s ease-in-out;
+    }
+    .preview-frame {
+      width: 177px; /* 47mm * 3.78 */
+      height: 177px;
+      border: 2px dashed red;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+    .contenido-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: auto;
+      transition: transform 0.2s ease;
     }
     .mirror {
       transform: scaleX(-1);
@@ -73,6 +90,9 @@
       #vistaPrevia, #vistaPrevia * {
         visibility: visible;
       }
+      .preview-frame {
+        border: none !important;
+      }
       #vistaPrevia {
         position: absolute;
         top: 0;
@@ -80,7 +100,6 @@
         width: 100%;
         height: 100%;
         display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
         font-size: 48px;
@@ -132,10 +151,20 @@
     <label for="tamanoLogo">Tamaño del Logo:</label>
     <input type="range" id="tamanoLogo" min="20" max="100" value="60" oninput="actualizarVistaPrevia()" />
 
+    <label for="posicionVertical">Posición vertical del bloque:</label>
+    <input type="range" id="posicionVertical" min="-50" max="50" value="0" oninput="actualizarVistaPrevia()" />
+
+    <label for="espacioLogoPatente">Espacio entre logo y patente:</label>
+    <input type="range" id="espacioLogoPatente" min="0" max="50" value="4" oninput="actualizarVistaPrevia()" />
+
     <button onclick="generarPlantilla()">Generar Plantilla</button>
     <button onclick="alternarEspejo()">Alternar Modo Espejo</button>
 
-    <div class="preview" id="vistaPrevia" style="display:none;"></div>
+    <div class="preview" id="vistaPrevia" style="display:none;">
+      <div class="preview-frame">
+        <div class="contenido-preview" id="contenidoPreview"></div>
+      </div>
+    </div>
 
     <button onclick="window.print()" style="display:none;" id="btnImprimir">Imprimir Plantilla</button>
   </div>
@@ -154,17 +183,23 @@
       const logo = document.getElementById('logo').value;
       const negrita = document.getElementById('negritaPatente').checked;
       const tamanoLogo = document.getElementById('tamanoLogo').value;
-      const vistaPrevia = document.getElementById('vistaPrevia');
+      const posicionVertical = document.getElementById('posicionVertical').value;
+      const espacioLogoPatente = document.getElementById('espacioLogoPatente').value;
+      const contenidoPreview = document.getElementById('contenidoPreview');
 
       if (patente.length !== 6) {
-        vistaPrevia.innerHTML = '<div style="color:red">Debe ingresar 6 caracteres</div>';
+        contenidoPreview.innerHTML = '<div style="color:red">Debe ingresar 6 caracteres</div>';
         return;
       }
 
       const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'};`;
+      const desplazamiento = `translateY(${posicionVertical}px)`;
+      const margenInferiorLogo = `${espacioLogoPatente}px`;
 
-      vistaPrevia.innerHTML = logo
-        ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:4px;" onerror="this.style.display='none';">
+      contenidoPreview.style.transform = desplazamiento;
+
+      contenidoPreview.innerHTML = logo
+        ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:${margenInferiorLogo};" onerror="this.style.display='none';">
            <div style="${estiloTexto}">${patente}</div>`
         : `<div style="${estiloTexto}">${patente}</div>`;
     }
