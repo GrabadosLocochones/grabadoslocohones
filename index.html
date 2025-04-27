@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Grabados Locohones</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 100%;
+      margin: auto;
+      background: #fff;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .preview {
+      position: relative;
+      margin-top: 16px;
+      font-size: 34px; /* Ajustado para no superar 9mm */
+      font-weight: bold;
+      background-color: white;
+      height: 160px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border-radius: 0;
+      transform: scaleX(1);
+      transition: transform 0.3s ease-in-out;
+    }
+    .preview-frame {
+      width: 177px; /* 47mm * 3.78 */
+      height: 177px;
+      border: 2px dashed red;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+    .contenido-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: auto;
+      transition: transform 0.2s ease;
+    }
+    .mirror {
+      transform: scaleX(-1);
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    input, select {
+      padding: 12px;
+      width: 100%;
+      margin-bottom: 15px;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    @media print {
+      @page {
+        size: 57mm 40mm;
+        margin: 0;
+      }
+      html, body {
+        height: 40mm;
+        overflow: hidden;
+      }
+      body * {
+        visibility: hidden;
+      }
+      #vistaPrevia, #vistaPrevia * {
+        visibility: visible;
+      }
+      .preview-frame {
+        border: none !important;
+      }
+      #vistaPrevia {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 34px; /* También respetamos aquí el tamaño */
+        page-break-after: avoid;
+        page-break-before: avoid;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <label for="patente">Patente del Vehículo:</label>
+    <input type="text" id="patente" placeholder="Ej: ZX2942" maxlength="6" oninput="this.value = this.value.toUpperCase(); actualizarVistaPrevia();" />
+
+    <label for="logo">Marca del Vehículo (opcional):</label>
+    <select id="logo" onchange="actualizarVistaPrevia()">
+      <option value="">-- Sin Marca --</option>
+      <option value="toyota.png">Toyota</option>
+      <option value="chevrolet.png">Chevrolet</option>
+      <option value="ford.png">Ford</option>
+      <option value="hyundai.png">Hyundai</option>
+      <option value="kia.png">Kia</option>
+      <option value="nissan.png">Nissan</option>
+      <option value="jeep.png">Jeep</option>
+      <option value="volvo.png">Volvo</option>
+      <option value="mercedes.png">Mercedes-Benz</option>
+      <option value="maxus.png">Maxus</option>
+      <option value="volkswagen.png">Volkswagen</option>
+      <option value="changan.png">Changan</option>
+      <option value="audi.png">Audi</option>
+      <option value="bmw.png">BMW</option>
+      <option value="chery.png">Chery</option>
+      <option value="citroen.png">Citroen</option>
+      <option value="greatWall.png">Great Wall</option>
+      <option value="honda.png">Honda</option>
+      <option value="jetour.png">Jetour</option>
+      <option value="mazda.png">Mazda</option>
+      <option value="peugeot.png">Peugeot</option>
+      <option value="renault.png">Renault</option>
+      <option value="samsung.png">Samsung</option>
+      <option value="ssangyong.png">Ssangyong</option>
+      <option value="subaru.png">Subaru</option>
+      <option value="susuki.png">Susuki</option>
+    </select>
+
+    <label><input type="checkbox" id="negritaPatente" onchange="actualizarVistaPrevia()" /> Texto en Negrita</label>
+
+    <label for="tamanoLogo">Tamaño del Logo:</label>
+    <input type="range" id="tamanoLogo" min="20" max="100" value="60" oninput="actualizarVistaPrevia()" />
+
+    <label for="posicionVertical">Posición vertical del bloque:</label>
+    <input type="range" id="posicionVertical" min="-50" max="50" value="0" oninput="actualizarVistaPrevia()" />
+
+    <label for="espacioLogoPatente">Espacio entre logo y patente:</label>
+    <input type="range" id="espacioLogoPatente" min="0" max="50" value="4" oninput="actualizarVistaPrevia()" />
+
+    <button onclick="generarPlantilla()">Generar Plantilla</button>
+    <button onclick="alternarEspejo()">Alternar Modo Espejo</button>
+
+    <div class="preview" id="vistaPrevia" style="display:none;">
+      <div class="preview-frame">
+        <div class="contenido-preview" id="contenidoPreview"></div>
+      </div>
+    </div>
+
+    <button onclick="window.print()" style="display:none;" id="btnImprimir">Imprimir Plantilla</button>
+  </div>
+
+  <script>
+    function generarPlantilla() {
+      const vistaPrevia = document.getElementById('vistaPrevia');
+      const btnImprimir = document.getElementById('btnImprimir');
+      vistaPrevia.style.display = 'flex';
+      btnImprimir.style.display = 'inline-block';
+      vistaPrevia.classList.add('mirror'); // Modo espejo automático
+      actualizarVistaPrevia();
+    }
+
+    function actualizarVistaPrevia() {
+      const patente = document.getElementById('patente').value.trim().toUpperCase();
+      const logo = document.getElementById('logo').value;
+      const negrita = document.getElementById('negritaPatente').checked;
+      const tamanoLogo = document.getElementById('tamanoLogo').value;
+      const posicionVertical = document.getElementById('posicionVertical').value;
+      const espacioLogoPatente = document.getElementById('espacioLogoPatente').value;
+      const contenidoPreview = document.getElementById('contenidoPreview');
+
+      if (patente.length !== 6) {
+        contenidoPreview.innerHTML = '<div style="color:red">Debe ingresar 6 caracteres</div>';
+        return;
+      }
+
+      const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'}; font-size:34px;`;
+      const desplazamiento = `translateY(${posicionVertical}px)`;
+      const margenInferiorLogo = `${espacioLogoPatente}px`;
+
+      contenidoPreview.style.transform = desplazamiento;
+
+      contenidoPreview.innerHTML = logo
+        ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:${margenInferiorLogo};" onerror="this.style.display='none';">
+           <div style="${estiloTexto}">${patente}</div>`
+        : `<div style="${estiloTexto}">${patente}</div>`;
+    }
+
+    function alternarEspejo() {
+      const vistaPrevia = document.getElementById('vistaPrevia');
+      vistaPrevia.classList.toggle('mirror');
+    }
+  </script>
+</body>
+</html>
