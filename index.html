@@ -8,8 +8,7 @@
     body { font-family: Arial, sans-serif; padding: 16px; margin: 0; background-color: #f5f5f5; }
     .container { max-width: 100%; margin: auto; background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .preview { position: relative; margin-top: 16px; font-size: 34px; font-weight: bold; background-color: white; height: 160px; width: 100%;
-      display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 0; transform: scaleX(1);
-      transition: transform 0.3s ease-in-out; }
+      display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 0; transition: transform 0.3s ease-in-out; }
     .mirror { transform: scaleX(-1); }
     .preview-frame { width: 177px; height: 177px; border: 2px dashed red; position: relative; display: flex; justify-content: center;
       align-items: center; pointer-events: none; }
@@ -138,18 +137,14 @@
       container.innerHTML = '';
       container.style.display = 'block';
 
-      const contenidoOriginal = document.getElementById('contenidoPreview').innerHTML;
-      const esEspejado = document.getElementById('vistaPrevia').classList.contains('mirror');
+      const vistaPrevia = document.getElementById('vistaPrevia');
+      const previewFrame = vistaPrevia.querySelector('.preview-frame');
 
       for (let i = 0; i < cantidad; i++) {
         const copia = document.createElement('div');
         copia.className = 'copia';
-        copia.innerHTML = `
-          <div class="preview-frame">
-            <div class="contenido-preview ${esEspejado ? 'mirror' : ''}" style="display:flex; flex-direction:column; align-items:center;">
-              ${contenidoOriginal}
-            </div>
-          </div>`;
+        const clon = previewFrame.cloneNode(true);
+        copia.appendChild(clon);
         container.appendChild(copia);
       }
 
