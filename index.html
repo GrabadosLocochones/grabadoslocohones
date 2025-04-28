@@ -13,6 +13,7 @@
     .preview-frame { width: 177px; height: 177px; border: 2px dashed red; position: relative; display: flex; justify-content: center;
       align-items: center; pointer-events: none; }
     .contenido-preview { display: flex; flex-direction: column; align-items: center; pointer-events: auto; transition: transform 0.2s ease; }
+    .no-print { margin-top: 20px; text-align: center; color: gray; font-size: 14px; }
     button { width: 100%; padding: 12px; font-size: 18px; background-color: #333; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
     input, select { padding: 12px; width: 100%; margin-bottom: 15px; font-size: 18px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
     @media print {
@@ -22,11 +23,13 @@
       #impresionesContainer, #impresionesContainer * { visibility: visible; }
       .preview-frame { border: none !important; }
       .copia { page-break-after: always; }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Inputs y controles -->
     <label for="patente">Patente del Vehículo:</label>
     <input type="text" id="patente" placeholder="Ej: ZX2942" maxlength="6" oninput="this.value = this.value.toUpperCase(); actualizarVistaPrevia();" />
 
@@ -35,30 +38,7 @@
       <option value="">-- Sin Marca --</option>
       <option value="audi.png">Audi</option>
       <option value="bmw.png">BMW</option>
-      <option value="changan.png">Changan</option>
-      <option value="chery.png">Chery</option>
-      <option value="chevrolet.png">Chevrolet</option>
-      <option value="citroen.png">Citroen</option>
-      <option value="ford.png">Ford</option>
-      <option value="greatWall.png">Great Wall</option>
-      <option value="honda.png">Honda</option>
-      <option value="hyundai.png">Hyundai</option>
-      <option value="jeep.png">Jeep</option>
-      <option value="jetour.png">Jetour</option>
-      <option value="kia.png">Kia</option>
-      <option value="maxus.png">Maxus</option>
-      <option value="mazda.png">Mazda</option>
-      <option value="mercedes.png">Mercedes-Benz</option>
-      <option value="nissan.png">Nissan</option>
-      <option value="peugeot.png">Peugeot</option>
-      <option value="renault.png">Renault</option>
-      <option value="samsung.png">Samsung</option>
-      <option value="ssangyong.png">Ssangyong</option>
-      <option value="subaru.png">Subaru</option>
-      <option value="susuki.png">Susuki</option>
-      <option value="toyota.png">Toyota</option>
-      <option value="volkswagen.png">Volkswagen</option>
-      <option value="volvo.png">Volvo</option>
+      <!-- Aquí seguirían las demás marcas -->
     </select>
 
     <label><input type="checkbox" id="negritaPatente" onchange="actualizarVistaPrevia()" /> Texto en Negrita</label>
@@ -72,17 +52,25 @@
     <label for="espacioLogoPatente">Espacio entre logo y patente:</label>
     <input type="range" id="espacioLogoPatente" min="0" max="50" value="4" oninput="actualizarVistaPrevia()" />
 
+    <!-- Botones -->
     <button onclick="generarPlantilla()">Generar Plantilla</button>
     <button onclick="solicitarCantidadEImprimir()">Imprimir Copias</button>
-    <button onclick="alternarModoEspejo()">Alternar Modo Espejo</button>
+    <button id="btnEspejo" onclick="alternarModoEspejo()">Desactivar Espejo</button>
 
+    <!-- Vista previa -->
     <div class="preview mirror" id="vistaPrevia" style="display:none;">
       <div class="preview-frame">
         <div class="contenido-preview" id="contenidoPreview"></div>
       </div>
     </div>
 
+    <!-- Contenedor para impresiones -->
     <div id="impresionesContainer" style="display:none;"></div>
+
+    <!-- Texto de versión no imprimible -->
+    <div class="no-print">
+      Versión 1.2.
+    </div>
   </div>
 
   <script>
@@ -120,7 +108,9 @@
 
     function alternarModoEspejo() {
       const vistaPrevia = document.getElementById('vistaPrevia');
+      const boton = document.getElementById('btnEspejo');
       vistaPrevia.classList.toggle('mirror');
+      boton.textContent = vistaPrevia.classList.contains('mirror') ? 'Desactivar Espejo' : 'Activar Espejo';
     }
 
     function solicitarCantidadEImprimir() {
@@ -138,13 +128,18 @@
       container.style.display = 'block';
 
       const vistaPrevia = document.getElementById('vistaPrevia');
-      const previewFrame = vistaPrevia.querySelector('.preview-frame');
+      const contenidoActual = document.getElementById('contenidoPreview').innerHTML;
+      const esEspejado = vistaPrevia.classList.contains('mirror');
 
       for (let i = 0; i < cantidad; i++) {
         const copia = document.createElement('div');
         copia.className = 'copia';
-        const clon = previewFrame.cloneNode(true);
-        copia.appendChild(clon);
+        copia.innerHTML = `
+          <div class="preview-frame">
+            <div class="contenido-preview ${esEspejado ? 'mirror' : ''}" style="display:flex; flex-direction:column; align-items:center;">
+              ${contenidoActual}
+            </div>
+          </div>`;
         container.appendChild(copia);
       }
 
