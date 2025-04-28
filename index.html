@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -76,11 +77,10 @@
     }
     @media print {
       @page {
-        size: 57mm 40mm;
+        size: 57mm auto;
         margin: 0;
       }
       html, body {
-        height: 40mm;
         overflow: hidden;
       }
       body * {
@@ -97,7 +97,6 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -201,9 +200,9 @@
       contenidoPreview.innerHTML = logo
         ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:${margenInferiorLogo};" onerror="this.style.display='none';">
            <div style="${estiloTexto}">${patente}</div>
-           <div style="height:18px;"></div>`
+           <div style="height:18px; page-break-after:always;"></div>`
         : `<div style="${estiloTexto}">${patente}</div>
-           <div style="height:18px;"></div>`;
+           <div style="height:18px; page-break-after:always;"></div>`;
     }
 
     function alternarEspejo() {
