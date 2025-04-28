@@ -5,106 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Grabados Locohones</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 16px;
-      margin: 0;
-      background-color: #f5f5f5;
-    }
-    .container {
-      max-width: 100%;
-      margin: auto;
-      background: #fff;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .preview {
-      position: relative;
-      margin-top: 16px;
-      font-size: 34px;
-      font-weight: bold;
-      background-color: white;
-      height: 160px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      border-radius: 0;
-      transform: scaleX(1);
-      transition: transform 0.3s ease-in-out;
-    }
-    .preview-frame {
-      width: 177px;
-      height: 177px;
-      border: 2px dashed red;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      pointer-events: none;
-    }
-    .contenido-preview {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      pointer-events: auto;
-      transition: transform 0.2s ease;
-    }
-    .mirror {
-      transform: scaleX(-1);
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      font-size: 18px;
-      background-color: #333;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    input, select {
-      padding: 12px;
-      width: 100%;
-      margin-bottom: 15px;
-      font-size: 18px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
+    body { font-family: Arial, sans-serif; padding: 16px; margin: 0; background-color: #f5f5f5; }
+    .container { max-width: 100%; margin: auto; background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .preview { position: relative; margin-top: 16px; font-size: 34px; font-weight: bold; background-color: white; height: 160px; width: 100%;
+      display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 0; transform: scaleX(1);
+      transition: transform 0.3s ease-in-out; }
+    .mirror { transform: scaleX(-1); }
+    .preview-frame { width: 177px; height: 177px; border: 2px dashed red; position: relative; display: flex; justify-content: center;
+      align-items: center; pointer-events: none; }
+    .contenido-preview { display: flex; flex-direction: column; align-items: center; pointer-events: auto; transition: transform 0.2s ease; }
+    button { width: 100%; padding: 12px; font-size: 18px; background-color: #333; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+    input, select { padding: 12px; width: 100%; margin-bottom: 15px; font-size: 18px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
     @media print {
-      @page {
-        size: 57mm auto;
-        margin: 0;
-      }
-      html, body {
-        overflow: hidden;
-      }
-      body * {
-        visibility: hidden;
-      }
-      #vistaPrevia, #vistaPrevia * {
-        visibility: visible;
-      }
-      .preview-frame {
-        border: none !important;
-      }
-      #vistaPrevia {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 34px;
-        page-break-after: avoid;
-        page-break-before: avoid;
-        page-break-inside: avoid;
-      }
+      @page { size: 57mm auto; margin: 0; }
+      html, body { overflow: hidden; }
+      body * { visibility: hidden; }
+      #impresionesContainer, #impresionesContainer * { visibility: visible; }
+      .preview-frame { border: none !important; }
+      .copia { page-break-after: always; }
     }
   </style>
 </head>
@@ -156,24 +74,22 @@
     <input type="range" id="espacioLogoPatente" min="0" max="50" value="4" oninput="actualizarVistaPrevia()" />
 
     <button onclick="generarPlantilla()">Generar Plantilla</button>
-    <button onclick="alternarEspejo()">Alternar Modo Espejo</button>
+    <button onclick="solicitarCantidadEImprimir()">Imprimir Copias</button>
+    <button onclick="alternarModoEspejo()">Alternar Modo Espejo</button>
 
-    <div class="preview" id="vistaPrevia" style="display:none;">
+    <div class="preview mirror" id="vistaPrevia" style="display:none;">
       <div class="preview-frame">
         <div class="contenido-preview" id="contenidoPreview"></div>
       </div>
     </div>
 
-    <button onclick="window.print()" style="display:none;" id="btnImprimir">Imprimir Plantilla</button>
+    <div id="impresionesContainer" style="display:none;"></div>
   </div>
 
   <script>
     function generarPlantilla() {
       const vistaPrevia = document.getElementById('vistaPrevia');
-      const btnImprimir = document.getElementById('btnImprimir');
       vistaPrevia.style.display = 'flex';
-      btnImprimir.style.display = 'inline-block';
-      vistaPrevia.classList.add('mirror');
       actualizarVistaPrevia();
     }
 
@@ -199,15 +115,47 @@
 
       contenidoPreview.innerHTML = logo
         ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:${margenInferiorLogo};" onerror="this.style.display='none';">
-           <div style="${estiloTexto}">${patente}</div>
-           <div style="height:18px; page-break-after:always;"></div>`
-        : `<div style="${estiloTexto}">${patente}</div>
-           <div style="height:18px; page-break-after:always;"></div>`;
+           <div style="${estiloTexto}">${patente}</div>`
+        : `<div style="${estiloTexto}">${patente}</div>`;
     }
 
-    function alternarEspejo() {
+    function alternarModoEspejo() {
       const vistaPrevia = document.getElementById('vistaPrevia');
       vistaPrevia.classList.toggle('mirror');
+    }
+
+    function solicitarCantidadEImprimir() {
+      const cantidad = prompt("¿Cuántas copias deseas imprimir?");
+      if (cantidad && !isNaN(cantidad) && parseInt(cantidad) > 0) {
+        imprimirCopias(parseInt(cantidad));
+      } else {
+        alert("Por favor ingresa un número válido.");
+      }
+    }
+
+    function imprimirCopias(cantidad) {
+      const container = document.getElementById('impresionesContainer');
+      container.innerHTML = '';
+      container.style.display = 'block';
+
+      const contenidoOriginal = document.getElementById('contenidoPreview').innerHTML;
+      const esEspejado = document.getElementById('vistaPrevia').classList.contains('mirror');
+
+      for (let i = 0; i < cantidad; i++) {
+        const copia = document.createElement('div');
+        copia.className = 'copia';
+        copia.innerHTML = `
+          <div class="preview-frame">
+            <div class="contenido-preview ${esEspejado ? 'mirror' : ''}" style="display:flex; flex-direction:column; align-items:center;">
+              ${contenidoOriginal}
+            </div>
+          </div>`;
+        container.appendChild(copia);
+      }
+
+      window.print();
+      container.innerHTML = '';
+      container.style.display = 'none';
     }
   </script>
 </body>
