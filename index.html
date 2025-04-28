@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Grabados Locohones</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Grabados Locohones - Versión 1.4</title>
+
+  <!-- Librerías necesarias -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     body { font-family: Arial, sans-serif; padding: 16px; margin: 0; background-color: #f5f5f5; }
     .container { max-width: 100%; margin: auto; background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
@@ -28,13 +33,15 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Inputs y controles -->
-    <label for="patente">Patente del Vehículo:</label>
-    <input type="text" id="patente" placeholder="Ej: ZX2942" maxlength="6" oninput="this.value = this.value.toUpperCase(); actualizarVistaPrevia();" />
 
-    <label for="logo">Marca del Vehículo (opcional):</label>
-    <select id="logo" onchange="actualizarVistaPrevia()">
+<div class="container">
+
+  <!-- Inputs y controles -->
+  <label for="patente">Patente del Vehículo:</label>
+  <input type="text" id="patente" placeholder="Ej: ZX2942" maxlength="6" oninput="this.value = this.value.toUpperCase(); actualizarVistaPrevia();">
+
+  <label for="logo">Marca del Vehículo (opcional):</label>
+  <select id="logo" onchange="actualizarVistaPrevia()">
       <option value="">-- Sin Marca --</option>
       <option value="audi.png">Audi</option>
       <option value="bmw.png">BMW</option>
@@ -61,115 +68,135 @@
       <option value="susuki.png">Susuki</option>
       <option value="toyota.png">Toyota</option>
       <option value="volkswagen.png">Volkswagen</option>
-      <option value="volvo.png">Volvo</option>
-    </select>
+      <option value="volvo.png">Volvo</option>1.2
+  </select>
 
-    <label><input type="checkbox" id="negritaPatente" onchange="actualizarVistaPrevia()" /> Texto en Negrita</label>
+  <label><input type="checkbox" id="negritaPatente" onchange="actualizarVistaPrevia()"> Texto en Negrita</label>
 
-    <label for="tamanoLogo">Tamaño del Logo:</label>
-    <input type="range" id="tamanoLogo" min="20" max="100" value="60" oninput="actualizarVistaPrevia()" />
+  <label for="tamanoLogo">Tamaño del Logo:</label>
+  <input type="range" id="tamanoLogo" min="20" max="100" value="60" oninput="actualizarVistaPrevia()">
 
-    <label for="posicionVertical">Posición vertical del bloque:</label>
-    <input type="range" id="posicionVertical" min="-50" max="50" value="0" oninput="actualizarVistaPrevia()" />
+  <label for="posicionVertical">Posición vertical del bloque:</label>
+  <input type="range" id="posicionVertical" min="-50" max="50" value="0" oninput="actualizarVistaPrevia()">
 
-    <label for="espacioLogoPatente">Espacio entre logo y patente:</label>
-    <input type="range" id="espacioLogoPatente" min="0" max="50" value="4" oninput="actualizarVistaPrevia()" />
+  <label for="espacioLogoPatente">Espacio entre logo y patente:</label>
+  <input type="range" id="espacioLogoPatente" min="0" max="50" value="4" oninput="actualizarVistaPrevia()">
 
-    <!-- Botones -->
-    <button onclick="generarPlantilla()">Generar Plantilla</button>
-    <button onclick="solicitarCantidadEImprimir()">Imprimir Copias</button>
-    <button id="btnEspejo" onclick="alternarModoEspejo()">Desactivar Espejo</button>
+  <!-- Botones principales -->
+  <button onclick="generarPlantilla()">Generar Plantilla</button>
+  <button onclick="solicitarCantidadEImprimir()">Imprimir Copias</button>
+  <button onclick="generarPDF()">Generar PDF</button>
+  <button id="btnEspejo" onclick="alternarModoEspejo()">Desactivar Espejo</button>
 
-    <!-- Vista previa -->
-    <div class="preview mirror" id="vistaPrevia" style="display:none;">
-      <div class="preview-frame">
-        <div class="contenido-preview" id="contenidoPreview"></div>
-      </div>
-    </div>
-
-    <!-- Contenedor para impresiones -->
-    <div id="impresionesContainer" style="display:none;"></div>
-
-    <!-- Texto de versión no imprimible -->
-    <div class="no-print">
-      Versión 1.3.
+  <!-- Vista previa -->
+  <div class="preview mirror" id="vistaPrevia" style="display:none;">
+    <div class="preview-frame">
+      <div class="contenido-preview" id="contenidoPreview"></div>
     </div>
   </div>
 
-  <script>
-    function generarPlantilla() {
-      const vistaPrevia = document.getElementById('vistaPrevia');
-      vistaPrevia.style.display = 'flex';
-      actualizarVistaPrevia();
+  <!-- Contenedor de impresiones -->
+  <div id="impresionesContainer" style="display:none;"></div>
+
+  <!-- Información de versión no imprimible -->
+  <div class="no-print">
+    Versión 1.4.
+  </div>
+
+</div>
+
+<!-- Scripts -->
+<script>
+  function generarPlantilla() {
+    const vistaPrevia = document.getElementById('vistaPrevia');
+    vistaPrevia.style.display = 'flex';
+    actualizarVistaPrevia();
+  }
+
+  function actualizarVistaPrevia() {
+    const patente = document.getElementById('patente').value.trim().toUpperCase();
+    const logo = document.getElementById('logo').value;
+    const negrita = document.getElementById('negritaPatente').checked;
+    const tamanoLogo = document.getElementById('tamanoLogo').value;
+    const posicionVertical = document.getElementById('posicionVertical').value;
+    const espacioLogoPatente = document.getElementById('espacioLogoPatente').value;
+    const contenidoPreview = document.getElementById('contenidoPreview');
+
+    if (patente.length !== 6) {
+      contenidoPreview.innerHTML = '<div style="color:red">Debe ingresar 6 caracteres</div>';
+      return;
     }
 
-    function actualizarVistaPrevia() {
-      const patente = document.getElementById('patente').value.trim().toUpperCase();
-      const logo = document.getElementById('logo').value;
-      const negrita = document.getElementById('negritaPatente').checked;
-      const tamanoLogo = document.getElementById('tamanoLogo').value;
-      const posicionVertical = document.getElementById('posicionVertical').value;
-      const espacioLogoPatente = document.getElementById('espacioLogoPatente').value;
-      const contenidoPreview = document.getElementById('contenidoPreview');
+    const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'}; font-size:34px;`;
+    const desplazamiento = `translateY(${posicionVertical}px)`;
+    const margenInferiorLogo = `${espacioLogoPatente}px`;
 
-      if (patente.length !== 6) {
-        contenidoPreview.innerHTML = '<div style="color:red">Debe ingresar 6 caracteres</div>';
-        return;
-      }
+    contenidoPreview.style.transform = desplazamiento;
 
-      const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'}; font-size:34px;`;
-      const desplazamiento = `translateY(${posicionVertical}px)`;
-      const margenInferiorLogo = `${espacioLogoPatente}px`;
+    contenidoPreview.innerHTML = logo
+      ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:${margenInferiorLogo};" onerror="this.style.display='none';">
+         <div style="${estiloTexto}">${patente}</div>`
+      : `<div style="${estiloTexto}">${patente}</div>`;
+  }
 
-      contenidoPreview.style.transform = desplazamiento;
+  function alternarModoEspejo() {
+    const vistaPrevia = document.getElementById('vistaPrevia');
+    const boton = document.getElementById('btnEspejo');
+    vistaPrevia.classList.toggle('mirror');
+    boton.textContent = vistaPrevia.classList.contains('mirror') ? 'Desactivar Espejo' : 'Activar Espejo';
+  }
 
-      contenidoPreview.innerHTML = logo
-        ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:${margenInferiorLogo};" onerror="this.style.display='none';">
-           <div style="${estiloTexto}">${patente}</div>`
-        : `<div style="${estiloTexto}">${patente}</div>`;
+  function solicitarCantidadEImprimir() {
+    const cantidad = prompt("¿Cuántas copias deseas imprimir?");
+    if (cantidad && !isNaN(cantidad) && parseInt(cantidad) > 0) {
+      imprimirCopias(parseInt(cantidad));
+    } else {
+      alert("Por favor ingresa un número válido.");
+    }
+  }
+
+  function imprimirCopias(cantidad) {
+    const container = document.getElementById('impresionesContainer');
+    container.innerHTML = '';
+    container.style.display = 'block';
+
+    const vistaPrevia = document.getElementById('vistaPrevia');
+    const contenidoActual = document.getElementById('contenidoPreview').innerHTML;
+    const esEspejado = vistaPrevia.classList.contains('mirror');
+
+    for (let i = 0; i < cantidad; i++) {
+      const copia = document.createElement('div');
+      copia.className = 'copia';
+      copia.innerHTML = `
+        <div class="preview-frame">
+          <div class="contenido-preview ${esEspejado ? 'mirror' : ''}" style="display:flex; flex-direction:column; align-items:center;">
+            ${contenidoActual}
+          </div>
+        </div>`;
+      container.appendChild(copia);
     }
 
-    function alternarModoEspejo() {
-      const vistaPrevia = document.getElementById('vistaPrevia');
-      const boton = document.getElementById('btnEspejo');
-      vistaPrevia.classList.toggle('mirror');
-      boton.textContent = vistaPrevia.classList.contains('mirror') ? 'Desactivar Espejo' : 'Activar Espejo';
-    }
+    window.print();
+    container.innerHTML = '';
+    container.style.display = 'none';
+  }
 
-    function solicitarCantidadEImprimir() {
-      const cantidad = prompt("¿Cuántas copias deseas imprimir?");
-      if (cantidad && !isNaN(cantidad) && parseInt(cantidad) > 0) {
-        imprimirCopias(parseInt(cantidad));
-      } else {
-        alert("Por favor ingresa un número válido.");
-      }
-    }
+  async function generarPDF() {
+    const vistaPrevia = document.getElementById('vistaPrevia');
+    const canvas = await html2canvas(vistaPrevia, { backgroundColor: null });
+    const imgData = canvas.toDataURL('image/png');
 
-    function imprimirCopias(cantidad) {
-      const container = document.getElementById('impresionesContainer');
-      container.innerHTML = '';
-      container.style.display = 'block';
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: [58, 58] // 58mm x 58mm ideal para térmica
+    });
 
-      const vistaPrevia = document.getElementById('vistaPrevia');
-      const contenidoActual = document.getElementById('contenidoPreview').innerHTML;
-      const esEspejado = vistaPrevia.classList.contains('mirror');
+    pdf.addImage(imgData, 'PNG', 0, 0, 58, 58);
+    pdf.save('plantilla-patente.pdf');
+  }
+</script>
 
-      for (let i = 0; i < cantidad; i++) {
-        const copia = document.createElement('div');
-        copia.className = 'copia';
-        copia.innerHTML = `
-          <div class="preview-frame">
-            <div class="contenido-preview ${esEspejado ? 'mirror' : ''}" style="display:flex; flex-direction:column; align-items:center;">
-              ${contenidoActual}
-            </div>
-          </div>`;
-        container.appendChild(copia);
-      }
-
-      window.print();
-      container.innerHTML = '';
-      container.style.display = 'none';
-    }
-  </script>
 </body>
 </html>
