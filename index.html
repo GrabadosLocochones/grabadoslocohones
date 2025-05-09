@@ -46,8 +46,11 @@
       pointer-events: none;
     }
     .contenido-preview {
+      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
       pointer-events: auto;
       transition: transform 0.2s ease;
@@ -182,7 +185,6 @@
       const logo = document.getElementById('logo').value;
       const negrita = document.getElementById('negritaPatente').checked;
       const tamanoLogo = document.getElementById('tamanoLogo').value;
-      const posicionVertical = document.getElementById('posicionVertical').value;
       const espacioLogoPatente = document.getElementById('espacioLogoPatente').value;
       const contenidoPreview = document.getElementById('contenidoPreview');
 
@@ -191,18 +193,12 @@
         return;
       }
 
-      const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'}; font-size:34px;`;
-      const desplazamiento = `translateY(${posicionVertical}px)`;
-      const margenInferiorLogo = `${espacioLogoPatente}px`;
-
-      contenidoPreview.style.transform = desplazamiento;
+      const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'}; font-size:34px; text-align:center;`;
 
       contenidoPreview.innerHTML = logo
-        ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:${margenInferiorLogo};" onerror="this.style.display='none';">
-           <div style="${estiloTexto}">${patente}</div>
-           <div style="height:18px; page-break-after:always;"></div>`
-        : `<div style="${estiloTexto}">${patente}</div>
-           <div style="height:18px; page-break-after:always;"></div>`;
+        ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:${espacioLogoPatente}px;" onerror="this.style.display='none';">
+           <div style="${estiloTexto}">${patente}</div>`
+        : `<div style="${estiloTexto}">${patente}</div>`;
     }
 
     function alternarEspejo() {
