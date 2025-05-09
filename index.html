@@ -78,6 +78,12 @@
       border-radius: 6px;
       box-sizing: border-box;
     }
+    .no-print {
+      text-align: center;
+      color: #999;
+      font-size: 14px;
+      margin-top: 20px;
+    }
     @media print {
       @page {
         size: 57mm auto;
@@ -107,6 +113,9 @@
         page-break-after: avoid;
         page-break-before: avoid;
         page-break-inside: avoid;
+      }
+      .no-print {
+        display: none !important;
       }
     }
   </style>
@@ -170,6 +179,8 @@
     <button onclick="window.print()" style="display:none;" id="btnImprimir">Imprimir Plantilla</button>
   </div>
 
+  <div class="no-print">Versión 1.5</div>
+
   <script>
     function generarPlantilla() {
       const vistaPrevia = document.getElementById('vistaPrevia');
@@ -197,8 +208,10 @@
 
       contenidoPreview.innerHTML = logo
         ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:${espacioLogoPatente}px;" onerror="this.style.display='none';">
-           <div style="${estiloTexto}">${patente}</div>`
-        : `<div style="${estiloTexto}">${patente}</div>`;
+           <div style="${estiloTexto}">${patente}</div>
+           <div style="height:5mm;"></div>`
+        : `<div style="${estiloTexto}">${patente}</div>
+           <div style="height:5mm;"></div>`;
     }
 
     function alternarEspejo() {
