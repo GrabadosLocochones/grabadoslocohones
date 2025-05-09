@@ -117,6 +117,10 @@
       .no-print {
         display: none !important;
       }
+      #escalaImpresion {
+        transform: scale(0.95);
+        transform-origin: center center;
+      }
     }
   </style>
 </head>
@@ -130,30 +134,10 @@
       <option value="">-- Sin Marca --</option>
       <option value="audi.png">Audi</option>
       <option value="bmw.png">BMW</option>
-      <option value="changan.png">Changan</option>
-      <option value="chery.png">Chery</option>
-      <option value="chevrolet.png">Chevrolet</option>
-      <option value="citroen.png">Citroen</option>
-      <option value="ford.png">Ford</option>
-      <option value="greatWall.png">Great Wall</option>
-      <option value="honda.png">Honda</option>
-      <option value="hyundai.png">Hyundai</option>
-      <option value="jeep.png">Jeep</option>
-      <option value="jetour.png">Jetour</option>
       <option value="kia.png">Kia</option>
-      <option value="maxus.png">Maxus</option>
       <option value="mazda.png">Mazda</option>
-      <option value="mercedes.png">Mercedes-Benz</option>
-      <option value="nissan.png">Nissan</option>
-      <option value="peugeot.png">Peugeot</option>
-      <option value="renault.png">Renault</option>
-      <option value="samsung.png">Samsung</option>
-      <option value="ssangyong.png">Ssangyong</option>
-      <option value="subaru.png">Subaru</option>
-      <option value="susuki.png">Susuki</option>
       <option value="toyota.png">Toyota</option>
       <option value="volkswagen.png">Volkswagen</option>
-      <option value="volvo.png">Volvo</option>
     </select>
 
     <label><input type="checkbox" id="negritaPatente" onchange="actualizarVistaPrevia()" /> Texto en Negrita</label>
@@ -172,14 +156,16 @@
 
     <div class="preview" id="vistaPrevia" style="display:none;">
       <div class="preview-frame">
-        <div class="contenido-preview" id="contenidoPreview"></div>
+        <div class="contenido-preview" id="contenidoPreview">
+          <div id="escalaImpresion"></div>
+        </div>
       </div>
     </div>
 
     <button onclick="window.print()" style="display:none;" id="btnImprimir">Imprimir Plantilla</button>
   </div>
 
-  <div class="no-print">Versión 1.5</div>
+  <div class="no-print">Versión 1.6</div>
 
   <script>
     function generarPlantilla() {
@@ -197,16 +183,16 @@
       const negrita = document.getElementById('negritaPatente').checked;
       const tamanoLogo = document.getElementById('tamanoLogo').value;
       const espacioLogoPatente = document.getElementById('espacioLogoPatente').value;
-      const contenidoPreview = document.getElementById('contenidoPreview');
+      const escala = document.getElementById('escalaImpresion');
 
       if (patente.length !== 6) {
-        contenidoPreview.innerHTML = '<div style="color:red">Debe ingresar 6 caracteres</div>';
+        escala.innerHTML = '<div style="color:red">Debe ingresar 6 caracteres</div>';
         return;
       }
 
       const estiloTexto = `font-weight: ${negrita ? 'bold' : 'normal'}; font-size:34px; text-align:center;`;
 
-      contenidoPreview.innerHTML = logo
+      escala.innerHTML = logo
         ? `<img src="./logos/${logo}" alt="logo" style="height:${tamanoLogo}px; margin-bottom:${espacioLogoPatente}px;" onerror="this.style.display='none';">
            <div style="${estiloTexto}">${patente}</div>
            <div style="height:5mm;"></div>`
